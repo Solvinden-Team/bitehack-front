@@ -16,18 +16,24 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            rooms: [
-                Room({id: 0, name: "kuchnia1", count: 7, warningLevel: 0}),
-                Room({id: 1, name: "kuchnia2", count: 3, warningLevel: 0})
-            ]
-        }
+            rooms: []
+        };
     }
 
     componentDidMount() {
-        return;
-        fetch("addr")
+        // return;
+        fetch("http://localhost:8080/room/")
             .then(res => res.json())
-            .then(json => this.setState({ rooms: json.results }));
+            .then(data => {
+                let roomsFromJson = [];
+                for (let i = 0; i < data.length; i++) {
+                    roomsFromJson.push(Room({id: i, name: data[i].room, count: data[i].peopleCount, warningLevel: 0}));
+                }
+                this.setState({ rooms: roomsFromJson })})
+            .catch(_ => this.setState({ rooms: [
+                    Room({id: 0, name: "kuchniaOffline1", count: 7, warningLevel: 0}),
+                    Room({id: 1, name: "kuchniaOffline2", count: 3, warningLevel: 0})
+                ] }));
     }
 
     render() {
