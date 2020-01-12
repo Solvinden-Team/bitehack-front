@@ -1,9 +1,18 @@
 import React from 'react';
 import './App.css';
 import Room from './Room.js'
-import PersistentDrawerLeft from './drawer/Drawer.js'
-import {GridList, GridListTile, Paper} from '@material-ui/core';
+import {GridList, Paper} from '@material-ui/core';
 import {styled} from '@material-ui/core/styles';
+import Typography from "@material-ui/core/Typography";
+import Drawer from "@material-ui/core/Drawer";
+import Toolbar from '@material-ui/core/Toolbar';
+import List from '@material-ui/core/List';
+import Divider from '@material-ui/core/Divider';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 
 
 const RoomTile = styled(Paper)({
@@ -18,9 +27,16 @@ class App extends React.Component {
         super(props);
         this.state = {
             rooms: [],
-            allRooms: []
+            allRooms: [],
+            open: false,
+        };
+        this.handleDrawerOpen = () => this.toggleDrawer(true);
+        this.handleDrawerClose = () => this.toggleDrawer(false);
+        this.toggleDrawer = (open) => {
+            this.setState({open: open});
         };
     }
+
 
     filterAndSort(sortingKey, isDescending, filters) {
         let rooms = this.state.allRooms.slice();
@@ -60,11 +76,53 @@ class App extends React.Component {
     render() {
         return (
             <div className="App">
-                <PersistentDrawerLeft parent={this}/>
+                <Toolbar>
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={this.handleDrawerOpen}
+                        edge="start"
+                    >
+                        <MenuIcon/>
+                    </IconButton>
+                    <Typography variant="h5" color={'white'} noWrap>
+                        Chwytliwa Nazwa
+                    </Typography>
+                </Toolbar>
+                <Drawer
+                    variant="persistent"
+                    anchor="left"
+                    open={this.state.open}
+                >
+                    <div>
+                        <IconButton onClick={this.handleDrawerClose}>
+                            <ChevronLeftIcon/>
+                        </IconButton>
+                    </div>
+                    <Divider/>
+                    <List>
+                        <ListItem>
+                            <ListItemText primary="Sorting"/>
+                        </ListItem>
+                        <ListItem button key="sortByName" onClick={() => this.filterAndSort('name', true, {})}>
+                            <ListItemText primary="Name"/>
+                        </ListItem>
+                        <ListItem button key="sortByCount" onClick={() => this.filterAndSort('peopleCount', true, {})}>
+                            <ListItemText primary="Count"/>
+                        </ListItem>
+                        <ListItem button key="sortByDescription"
+                                  onClick={() => this.filterAndSort('description', true, {})}>
+                            <ListItemText primary="Description"/>
+                        </ListItem>
+                    </List>
+                    <Divider/>
+                    <List>
+                        <ListItem>
+                            <ListItemText primary="Filter"/>
+                        </ListItem>
+                    </List>
+                </Drawer>
                 <GridList cellHeight={'auto'} className="Room-grid" cols={4}>
-                    {/*<GridListTile className="Subheader" cols={4} style={{height: 'auto'}}>*/}
-                    {/*    <h1>Chwytliwa Nazwa</h1>*/}
-                    {/*</GridListTile>*/}
                     {this.state.rooms.map(tile => (
                         <RoomTile key={tile.id} className="RoomTile">
                             <h2 align={'center'}>{tile.name}</h2>
