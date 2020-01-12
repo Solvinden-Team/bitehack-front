@@ -1,8 +1,7 @@
 import React from 'react';
 import './App.css';
 import Room from './Room.js'
-import {GridList, Paper} from '@material-ui/core';
-import {styled} from '@material-ui/core/styles';
+import {GridList} from '@material-ui/core';
 import Typography from "@material-ui/core/Typography";
 import Drawer from "@material-ui/core/Drawer";
 import Toolbar from '@material-ui/core/Toolbar';
@@ -17,11 +16,6 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-
-
-const RoomTile = styled(Paper)({
-    elevation: 24,
-});
 
 const peopleInsideStr = "People inside: ";
 
@@ -48,19 +42,24 @@ class App extends React.Component {
 
     filterAndSort(sortingKey) {
         let rooms = this.state.allRooms.slice();
-        {/*TODO: fix filtering*/
-        }
+        /*TODO: fix filtering*/
         // rooms = rooms.filter((room) => room.tags.some((tag => this.state.tags[tag])));
         rooms = rooms.sort((a, b) => {
-            if (!this.state.isChecked)
-                return ((+b[sortingKey] == b[sortingKey]) && (+a[sortingKey] != a[sortingKey])) || (a[sortingKey] - b[sortingKey]);
+            if (this.state.isChecked)
+                return a[sortingKey] >= b[sortingKey] ? 1 : -1;
             else
-                return ((+a[sortingKey] == a[sortingKey]) && (+b[sortingKey] != b[sortingKey])) || (b[sortingKey] - a[sortingKey]);
+                return b[sortingKey] >= a[sortingKey] ? 1 : -1;
         });
         this.setState({
             lastSortingKey: sortingKey,
             rooms: rooms
         })
+    }
+
+    switchAndSort() {
+        this.setState({isChecked: !this.state.isChecked}, () => {
+            this.filterAndSort(this.state.lastSortingKey);
+        });
     }
 
     componentDidMount() {
@@ -154,10 +153,7 @@ class App extends React.Component {
                         <FormControlLabel
                             control={
                                 <Checkbox ref="ascending"
-                                          onChange={() => {
-                                              this.setState({isChecked: !this.state.isChecked});
-                                              this.filterAndSort(this.state.lastSortingKey);
-                                          }}/>
+                                          onChange={() => this.switchAndSort()}/>
                             }
                             label="Is Ascending?"
                         />
