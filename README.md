@@ -1,3 +1,9 @@
+# Coffree
+## Web Application module
+This part of the Coffree application is responsible for providing user-friendly interface for receiving information from the system.
+
+---------
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
