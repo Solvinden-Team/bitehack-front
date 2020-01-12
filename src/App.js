@@ -29,7 +29,8 @@ class App extends React.Component {
             open: false,
             isChecked: false,
             lastSortingKey: "name",
-            tags: []
+            tags: [],
+            effectiveTags: []
         };
         this.handleDrawerOpen = () => this.toggleDrawer(true);
         this.handleDrawerClose = () => this.toggleDrawer(false);
@@ -89,7 +90,7 @@ class App extends React.Component {
                 });
                 this.setState({
                     allRooms: this.state.rooms.slice(),
-                    tags: [['test', false], ['tset', false]]
+                    tags: ["test", "tset"]
                 })
             });
 
@@ -98,7 +99,7 @@ class App extends React.Component {
             .then(data => {
                 let tagsFromJson = [];
                 for (let i = 0; i < data.length; i++) {
-                    tagsFromJson.push([data[i].name, false]);
+                    tagsFromJson.push(data[i].name);
                 }
                 this.setState({tags: tagsFromJson});
             });
@@ -172,7 +173,7 @@ class App extends React.Component {
                                             // this.setState({tags: tags}, () => this.filterAndSort(this.state.lastSortingKey));
                                         }}/>
                                 }
-                                label={a[0]}
+                                label={a}
                             />
                         ))}
                     </List>
