@@ -29,8 +29,8 @@ class App extends React.Component {
             open: false,
             isChecked: false,
             lastSortingKey: "name",
-            taglist: [],
-            tags: {}
+            tags: [],
+            effectiveTags: []
         };
         this.handleDrawerOpen = () => this.toggleDrawer(true);
         this.handleDrawerClose = () => this.toggleDrawer(false);
@@ -42,8 +42,9 @@ class App extends React.Component {
 
     filterAndSort(sortingKey) {
         let rooms = this.state.allRooms.slice();
-        /*TODO: fix filtering*/
-        // rooms = rooms.filter((room) => room.tags.some((tag => this.state.tags[tag])));
+        if (this.state.effectiveTags.length !== 0) {
+            rooms = rooms.filter((room) => room.tags.some((tag => this.state.effectiveTags.includes(tag))));
+        }
         rooms = rooms.sort((a, b) => {
             if (this.state.isChecked)
                 return a[sortingKey] >= b[sortingKey] ? 1 : -1;
@@ -74,7 +75,8 @@ class App extends React.Component {
                         name: data[i].room,
                         count: data[i].peopleCount,
                         description: data[i].roomDescription,
-                        warningLevel: 0
+                        warningLevel: 0,
+                        tags: data[i].tags
                     }));
                 }
                 this.setState({rooms: roomsFromJson});
@@ -89,20 +91,18 @@ class App extends React.Component {
                 });
                 this.setState({
                     allRooms: this.state.rooms.slice(),
-                    taglist: ['test', 'tset'],
-                    tags: {'test': false, 'tset': false}
+                    tags: ["test", "tset"]
                 })
             });
 
         fetch("http://localhost:8080/tags/")
             .then(res => res.json())
             .then(data => {
-                this.setState({taglist: data});
-                let tags = {};
+                let tagsFromJson = [];
                 for (let i = 0; i < data.length; i++) {
-                    tags[data[i]] = false;
+                    tagsFromJson.push(data[i].name);
                 }
-                this.setState({tags: tags});
+                this.setState({tags: tagsFromJson});
             });
     }
 
@@ -160,25 +160,28 @@ class App extends React.Component {
                     </List>
                     <Divider/>
                     {/*TODO: fix filtering*/}
-                    {/*<List>*/}
-                    {/*    <ListItem>*/}
-                    {/*        <ListItemText primary="Filter"/>*/}
-                    {/*    </ListItem>*/}
-                    {/*    {this.state.taglist.map(tag => (*/}
-                    {/*        <FormControlLabel*/}
-                    {/*            control={*/}
-                    {/*                <Checkbox*/}
-                    {/*                    onChange={() => {*/}
-                    {/*                        let tags = {...this.state.tags};*/}
-                    {/*                        tags[tag] = !tags[tag];*/}
-                    {/*                        this.setState({tags: tags});*/}
-                    {/*                        this.filterAndSort(this.state.lastSortingKey);*/}
-                    {/*                    }}/>*/}
-                    {/*            }*/}
-                    {/*            label={tag}*/}
-                    {/*        />*/}
-                    {/*    ))}*/}
-                    {/*</List>*/}
+                    <List>
+                        <ListItem>
+                            <ListItemText primary="Filter"/>
+                        </ListItem>
+                        {this.state.tags.map((a) => (
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        onChange={() => {
+                                            let effectiveTagsCopy = JSON.parse(JSON.stringify(this.state.effectiveTags));
+                                            if (effectiveTagsCopy.includes(a)) {
+                                                effectiveTagsCopy = effectiveTagsCopy.filter(elem => elem !== a)
+                                            } else {
+                                                effectiveTagsCopy.push(a)
+                                            }
+                                            this.setState({effectiveTags: effectiveTagsCopy}, () => this.filterAndSort(this.state.lastSortingKey));
+                                        }}/>
+                                }
+                                label={a}
+                            />
+                        ))}
+                    </List>
                 </Drawer>
                 <GridList cellHeight={'auto'} className="Room-grid" cols={4}>
                     {this.state.rooms.map(tile => (
@@ -193,7 +196,7 @@ class App extends React.Component {
                                 <Typography variant="body2" component="p">
                                     {peopleInsideStr}{tile.peopleCount}
                                 </Typography>
-                                {/*<h4>{tile.warningLevel}</h4>*/}
+                                <h4>{tile.tags}</h4>
                             </CardContent>
                         </Card>
                     ))}
