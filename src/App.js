@@ -17,7 +17,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 
-const peopleInsideStr = "People inside: ";
+const peopleInsideStr = "Liczba osób: ";
 
 
 class App extends React.Component {
@@ -30,7 +30,8 @@ class App extends React.Component {
             isChecked: false,
             lastSortingKey: "name",
             tags: [],
-            effectiveTags: []
+            effectiveTags: [],
+            comments: ["Za 15 minut będzie lepiej", "To optymalna sytuacja", "Za 30 minut będzie lepiej"]
         };
         this.handleDrawerOpen = () => this.toggleDrawer(true);
         this.handleDrawerClose = () => this.toggleDrawer(false);
@@ -191,12 +192,12 @@ class App extends React.Component {
                                     {tile.name}
                                 </Typography>
                                 <Typography className="RoomDescription" color="textSecondary">
-                                    {tile.description}
+                                    {tile.description} <br /><p><font color="black">{this.state.comments[Math.floor(Math.random() * this.state.comments.length)]}</font></p>
                                 </Typography>
                                 <Typography variant="body2" component="p">
                                     {peopleInsideStr}{tile.peopleCount}
                                 </Typography>
-                                <h4>{tile.tags}</h4>
+                                <h4>{tile.tags.map(s => (<div>#{s}</div> ))}</h4>
                             </CardContent>
                         </Card>
                     ))}
