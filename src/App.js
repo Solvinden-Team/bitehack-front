@@ -67,7 +67,7 @@ class App extends React.Component {
             .then(data => {
                 let roomsFromJson = [];
                 for (let i = 0; i < data.length; i++) {
-                    roomsFromJson.push(Room({id: i, name: data[i].room, count: data[i].peopleCount, warningLevel: 0}));
+                    roomsFromJson.push(Room({id: i, name: data[i].room, count: data[i].peopleCount, description: data[i].roomDescription, warningLevel: 0}));
                 }
                 this.setState({rooms: roomsFromJson});
                 this.setState({allRooms: this.state.rooms.slice()})
@@ -99,6 +99,7 @@ class App extends React.Component {
     }
 
     render() {
+
         return (
             <div className="App">
                 <Toolbar>
@@ -176,12 +177,20 @@ class App extends React.Component {
                 </Drawer>
                 <GridList cellHeight={'auto'} className="Room-grid" cols={4}>
                     {this.state.rooms.map(tile => (
-                        <RoomTile key={tile.id} className="RoomTile">
-                            <h2 align={'center'}>{tile.name}</h2>
-                            <h3>{peopleInsideStr}{tile.peopleCount}</h3>
+                        <Card className="RoomTile" variant="outlined">
+                            <CardContent>
+                                <Typography variant="h5" component="h2">
+                                    {tile.name}
+                                </Typography>
+                                <Typography className="RoomDescription" color="textSecondary">
+                                    {tile.description}
+                                </Typography>
+                                <Typography variant="body2" component="p">
+                                    {peopleInsideStr}{tile.peopleCount}
+                                </Typography>
                             {/*<h4>{tile.warningLevel}</h4>*/}
-                            <text>{tile.description}</text>
-                        </RoomTile>
+                            </CardContent>
+                        </Card>
                     ))}
                 </GridList>
             </div>
