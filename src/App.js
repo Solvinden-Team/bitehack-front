@@ -121,7 +121,7 @@ class App extends React.Component {
                         <MenuIcon/>
                     </IconButton>
                     <Typography variant="h5" color={'white'} noWrap>
-                        Chwytliwa Nazwa
+                        Coffree
                     </Typography>
                 </Toolbar>
                 <Drawer
