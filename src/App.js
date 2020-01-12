@@ -1,8 +1,9 @@
 import React from 'react';
 import './App.css';
 import Room from './Room.js'
+import PersistentDrawerLeft from './drawer/Drawer.js'
 import {GridList, GridListTile, Paper} from '@material-ui/core';
-import { styled } from '@material-ui/core/styles';
+import {styled} from '@material-ui/core/styles';
 
 
 const RoomTile = styled(Paper)({
@@ -16,8 +17,21 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            rooms: []
+            rooms: [],
+            allRooms: []
         };
+    }
+
+    filterAndSort(sortingKey, isDescending, filters) {
+        let rooms = this.state.allRooms.slice();
+        this.setState({
+            rooms: rooms.sort((a, b) => {
+                if (isDescending)
+                    return a[sortingKey] - b[sortingKey];
+                else
+                    return b[sortingKey] - a[sortingKey];
+            })
+        })
     }
 
     componentDidMount() {
@@ -29,20 +43,28 @@ class App extends React.Component {
                 for (let i = 0; i < data.length; i++) {
                     roomsFromJson.push(Room({id: i, name: data[i].room, count: data[i].peopleCount, warningLevel: 0}));
                 }
-                this.setState({ rooms: roomsFromJson })})
-            .catch(_ => this.setState({ rooms: [
-                    Room({id: 0, name: "kuchniaOffline1", count: 7, warningLevel: 0}),
-                    Room({id: 1, name: "kuchniaOffline2", count: 3, warningLevel: 0})
-                ] }));
+                this.setState({rooms: roomsFromJson});
+                this.setState({allRooms: this.state.rooms.slice()})
+            })
+            .catch(_ => {
+                this.setState({
+                    rooms: [
+                        Room({id: 0, name: "kuchniaOffline1", count: 7, warningLevel: 0}),
+                        Room({id: 1, name: "kuchniaOffline2", count: 3, warningLevel: 0})
+                    ]
+                });
+                this.setState({allRooms: this.state.rooms.slice()})
+            });
     }
 
     render() {
         return (
             <div className="App">
+                <PersistentDrawerLeft parent={this}/>
                 <GridList cellHeight={'auto'} className="Room-grid" cols={4}>
-                    <GridListTile className="Subheader" cols={4} style={{height: 'auto'}}>
-                        <h1>Chwytliwa Nazwa</h1>
-                    </GridListTile>
+                    {/*<GridListTile className="Subheader" cols={4} style={{height: 'auto'}}>*/}
+                    {/*    <h1>Chwytliwa Nazwa</h1>*/}
+                    {/*</GridListTile>*/}
                     {this.state.rooms.map(tile => (
                         <RoomTile key={tile.id} className="RoomTile">
                             <h2 align={'center'}>{tile.name}</h2>
