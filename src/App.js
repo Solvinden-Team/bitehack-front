@@ -15,6 +15,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 
 
 const RoomTile = styled(Paper)({
@@ -46,7 +48,8 @@ class App extends React.Component {
 
     filterAndSort(sortingKey) {
         let rooms = this.state.allRooms.slice();
-        {/*TODO: fix filtering*/}
+        {/*TODO: fix filtering*/
+        }
         // rooms = rooms.filter((room) => room.tags.some((tag => this.state.tags[tag])));
         rooms = rooms.sort((a, b) => {
             if (!this.state.isChecked)
@@ -67,7 +70,13 @@ class App extends React.Component {
             .then(data => {
                 let roomsFromJson = [];
                 for (let i = 0; i < data.length; i++) {
-                    roomsFromJson.push(Room({id: i, name: data[i].room, count: data[i].peopleCount, description: data[i].roomDescription, warningLevel: 0}));
+                    roomsFromJson.push(Room({
+                        id: i,
+                        name: data[i].room,
+                        count: data[i].peopleCount,
+                        description: data[i].roomDescription,
+                        warningLevel: 0
+                    }));
                 }
                 this.setState({rooms: roomsFromJson});
                 this.setState({allRooms: this.state.rooms.slice()})
@@ -188,7 +197,7 @@ class App extends React.Component {
                                 <Typography variant="body2" component="p">
                                     {peopleInsideStr}{tile.peopleCount}
                                 </Typography>
-                            {/*<h4>{tile.warningLevel}</h4>*/}
+                                {/*<h4>{tile.warningLevel}</h4>*/}
                             </CardContent>
                         </Card>
                     ))}
