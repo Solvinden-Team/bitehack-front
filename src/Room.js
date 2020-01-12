@@ -8,6 +8,7 @@ function Room(props) {
             peopleCount: props.count,
             warningLevel: props.warningLevel,
             description: props.description,
+            tags: props.tags,
         }
     )
 }

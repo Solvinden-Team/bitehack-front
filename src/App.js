@@ -33,7 +33,8 @@ class App extends React.Component {
             open: false,
             isChecked: false,
             lastSortingKey: "name",
-            filters: {}
+            taglist: [],
+            tags: {}
         };
         this.handleDrawerOpen = () => this.toggleDrawer(true);
         this.handleDrawerClose = () => this.toggleDrawer(false);
@@ -45,14 +46,17 @@ class App extends React.Component {
 
     filterAndSort(sortingKey) {
         let rooms = this.state.allRooms.slice();
+        {/*TODO: fix filtering*/}
+        // rooms = rooms.filter((room) => room.tags.some((tag => this.state.tags[tag])));
+        rooms = rooms.sort((a, b) => {
+            if (!this.state.isChecked)
+                return ((+b[sortingKey] == b[sortingKey]) && (+a[sortingKey] != a[sortingKey])) || (a[sortingKey] - b[sortingKey]);
+            else
+                return ((+a[sortingKey] == a[sortingKey]) && (+b[sortingKey] != b[sortingKey])) || (b[sortingKey] - a[sortingKey]);
+        });
         this.setState({
             lastSortingKey: sortingKey,
-            rooms: rooms.sort((a, b) => {
-                if (!this.state.isChecked)
-                    return ((+b[sortingKey] == b[sortingKey]) && (+a[sortingKey] != a[sortingKey])) || (a[sortingKey] - b[sortingKey]);
-                else
-                    return ((+a[sortingKey] == a[sortingKey]) && (+b[sortingKey] != b[sortingKey])) || (b[sortingKey] - a[sortingKey]);
-            })
+            rooms: rooms
         })
     }
 
@@ -71,11 +75,26 @@ class App extends React.Component {
             .catch(_ => {
                 this.setState({
                     rooms: [
-                        Room({id: 0, name: "kuchniaOffline1", count: 7, warningLevel: 0}),
-                        Room({id: 1, name: "kuchniaOffline2", count: 3, warningLevel: 0})
+                        Room({id: 0, name: "kuchniaOffline1", count: 7, warningLevel: 0, tags: ['tset']}),
+                        Room({id: 1, name: "kuchniaOffline2", count: 3, warningLevel: 0, tags: ['test']})
                     ]
                 });
-                this.setState({allRooms: this.state.rooms.slice()})
+                this.setState({
+                    allRooms: this.state.rooms.slice(),
+                    taglist: ['test', 'tset'],
+                    tags: {'test': false, 'tset': false}
+                })
+            });
+
+        fetch("http://localhost:8080/tags/")
+            .then(res => res.json())
+            .then(data => {
+                this.setState({taglist: data});
+                let tags = {};
+                for (let i = 0; i < data.length; i++) {
+                    tags[data[i]] = false;
+                }
+                this.setState({tags: tags});
             });
     }
 
@@ -126,7 +145,7 @@ class App extends React.Component {
                             control={
                                 <Checkbox ref="ascending"
                                           onChange={() => {
-                                              this.setState({isChecked: this.state.isChecked});
+                                              this.setState({isChecked: !this.state.isChecked});
                                               this.filterAndSort(this.state.lastSortingKey);
                                           }}/>
                             }
@@ -134,11 +153,26 @@ class App extends React.Component {
                         />
                     </List>
                     <Divider/>
-                    <List>
-                        <ListItem>
-                            <ListItemText primary="Filter"/>
-                        </ListItem>
-                    </List>
+                    {/*TODO: fix filtering*/}
+                    {/*<List>*/}
+                    {/*    <ListItem>*/}
+                    {/*        <ListItemText primary="Filter"/>*/}
+                    {/*    </ListItem>*/}
+                    {/*    {this.state.taglist.map(tag => (*/}
+                    {/*        <FormControlLabel*/}
+                    {/*            control={*/}
+                    {/*                <Checkbox*/}
+                    {/*                    onChange={() => {*/}
+                    {/*                        let tags = {...this.state.tags};*/}
+                    {/*                        tags[tag] = !tags[tag];*/}
+                    {/*                        this.setState({tags: tags});*/}
+                    {/*                        this.filterAndSort(this.state.lastSortingKey);*/}
+                    {/*                    }}/>*/}
+                    {/*            }*/}
+                    {/*            label={tag}*/}
+                    {/*        />*/}
+                    {/*    ))}*/}
+                    {/*</List>*/}
                 </Drawer>
                 <GridList cellHeight={'auto'} className="Room-grid" cols={4}>
                     {this.state.rooms.map(tile => (
