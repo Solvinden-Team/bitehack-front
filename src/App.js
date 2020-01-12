@@ -13,6 +13,8 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 
 const RoomTile = styled(Paper)({
@@ -29,6 +31,9 @@ class App extends React.Component {
             rooms: [],
             allRooms: [],
             open: false,
+            isChecked: false,
+            lastSortingKey: "name",
+            filters: {}
         };
         this.handleDrawerOpen = () => this.toggleDrawer(true);
         this.handleDrawerClose = () => this.toggleDrawer(false);
@@ -38,14 +43,15 @@ class App extends React.Component {
     }
 
 
-    filterAndSort(sortingKey, isDescending, filters) {
+    filterAndSort(sortingKey) {
         let rooms = this.state.allRooms.slice();
         this.setState({
+            lastSortingKey: sortingKey,
             rooms: rooms.sort((a, b) => {
-                if (isDescending)
-                    return a[sortingKey] - b[sortingKey];
+                if (!this.state.isChecked)
+                    return ((+b[sortingKey] == b[sortingKey]) && (+a[sortingKey] != a[sortingKey])) || (a[sortingKey] - b[sortingKey]);
                 else
-                    return b[sortingKey] - a[sortingKey];
+                    return ((+a[sortingKey] == a[sortingKey]) && (+b[sortingKey] != b[sortingKey])) || (b[sortingKey] - a[sortingKey]);
             })
         })
     }
@@ -104,16 +110,28 @@ class App extends React.Component {
                         <ListItem>
                             <ListItemText primary="Sorting"/>
                         </ListItem>
-                        <ListItem button key="sortByName" onClick={() => this.filterAndSort('name', true, {})}>
+                        <ListItem button key="sortByName"
+                                  onClick={() => this.filterAndSort('name')}>
                             <ListItemText primary="Name"/>
                         </ListItem>
-                        <ListItem button key="sortByCount" onClick={() => this.filterAndSort('peopleCount', true, {})}>
+                        <ListItem button key="sortByCount"
+                                  onClick={() => this.filterAndSort('peopleCount')}>
                             <ListItemText primary="Count"/>
                         </ListItem>
                         <ListItem button key="sortByDescription"
-                                  onClick={() => this.filterAndSort('description', true, {})}>
+                                  onClick={() => this.filterAndSort('description')}>
                             <ListItemText primary="Description"/>
                         </ListItem>
+                        <FormControlLabel
+                            control={
+                                <Checkbox ref="ascending"
+                                          onChange={() => {
+                                              this.setState({isChecked: this.state.isChecked});
+                                              this.filterAndSort(this.state.lastSortingKey);
+                                          }}/>
+                            }
+                            label="Is Ascending?"
+                        />
                     </List>
                     <Divider/>
                     <List>
