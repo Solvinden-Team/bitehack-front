@@ -42,8 +42,9 @@ class App extends React.Component {
 
     filterAndSort(sortingKey) {
         let rooms = this.state.allRooms.slice();
-        /*TODO: fix filtering*/
-        // rooms = rooms.filter((room) => room.tags.some((tag => this.state.tags[tag])));
+        if (this.state.effectiveTags.length !== 0) {
+            rooms = rooms.filter((room) => room.tags.some((tag => this.state.effectiveTags.includes(tag))));
+        }
         rooms = rooms.sort((a, b) => {
             if (this.state.isChecked)
                 return a[sortingKey] >= b[sortingKey] ? 1 : -1;
@@ -168,9 +169,13 @@ class App extends React.Component {
                                 control={
                                     <Checkbox
                                         onChange={() => {
-                                            let tags = {...this.state.tags};
-                                            // tags[a[0]] = !tags[a[0]];
-                                            // this.setState({tags: tags}, () => this.filterAndSort(this.state.lastSortingKey));
+                                            let effectiveTagsCopy = JSON.parse(JSON.stringify(this.state.effectiveTags));
+                                            if (effectiveTagsCopy.includes(a)) {
+                                                effectiveTagsCopy = effectiveTagsCopy.filter(elem => elem !== a)
+                                            } else {
+                                                effectiveTagsCopy.push(a)
+                                            }
+                                            this.setState({effectiveTags: effectiveTagsCopy}, () => this.filterAndSort(this.state.lastSortingKey));
                                         }}/>
                                 }
                                 label={a}
